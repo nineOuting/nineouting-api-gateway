@@ -26,6 +26,11 @@ spring:
               uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/workspaces/**,/api/invites/**,/api/folders/**
+            # SSE(/api/notifications/stream) 포함. WebFlux gateway는 스트리밍 응답을 그대로 중계한다
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/api/notifications/**
             - id: user-service-auth
               uri: ${USER_SERVICE_URL:http://localhost:8081}
               predicates:
