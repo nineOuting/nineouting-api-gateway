@@ -11,7 +11,11 @@
 | 경로 | 서비스 | 로그인 |
 |------|--------|--------|
 | `/api/auth/**` | user-service | 불필요 |
+| `/api/users/me/recent-folders` | workspace-service | 필요 |
 | `/api/users/**` | user-service | 필요 |
+| `/api/meetings/**`, `/api/folders/*/meetings/**`, `/api/folders/*/pending-agendas` | meeting-service | 필요 |
+| `/api/workspaces/**`, `/api/invites/**`, `/api/folders/**` (위 meeting 경로 제외) | workspace-service | 필요 |
+| `/api/notifications/**` (SSE 포함) | notification-service | 필요 |
 
 라우트에 없는 경로(`/internal/**`, `/.well-known/**` 포함)는 `404 NOT_FOUND`.
 
@@ -32,6 +36,9 @@
 | `SERVER_PORT` | `8080` | |
 | `MANAGEMENT_PORT` | `8090` | health·prometheus |
 | `USER_SERVICE_URL` | `http://localhost:8081` | |
+| `WORKSPACE_SERVICE_URL` | `http://localhost:8082` | |
+| `MEETING_SERVICE_URL` | `http://localhost:8083` | |
+| `NOTIFICATION_SERVICE_URL` | `http://localhost:8085` | |
 | `JWT_JWKS_URI` | `http://localhost:8081/.well-known/jwks.json` | access 토큰 검증용 공개키 |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | 프론트 주소 (쉼표로 여러 개) |
 

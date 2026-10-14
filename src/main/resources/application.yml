@@ -1,0 +1,52 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8090}   # health·prometheus는 외부 포트(8080)와 분리한다
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: classpath:observability/defaults.yml
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # 위에서부터 먼저 맞는 라우트로 간다. 서비스를 만들 때마다 추가한다 (docs/services/api-gateway.md 3장).
+          # /internal/**, /.well-known/** 같은 서비스 간 주소는 라우트를 만들지 않는다 (외부에 열지 않음).
+          routes:
+            # /api/users/me/recent-folders는 workspace-service 소유라 /api/users/** 보다 위에 둔다
+            - id: workspace-service-recent-folders
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/users/me/recent-folders
+            # 폴더 안의 회의·남은 안건은 meeting-service 소유라 /api/folders/** 보다 위에 둔다
+            - id: meeting-service
+              uri: ${MEETING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/meetings/**,/api/folders/*/meetings/**,/api/folders/*/pending-agendas
+            - id: workspace-service
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/workspaces/**,/api/invites/**,/api/folders/**
+            # SSE(/api/notifications/stream) 포함. WebFlux gateway는 스트리밍 응답을 그대로 중계한다
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/api/notifications/**
+            - id: user-service-auth
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/**
+            - id: user-service-users
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/users/**
+
+nineouting:
+  gateway:
+    jwks-uri: ${JWT_JWKS_URI:http://localhost:8081/.well-known/jwks.json}
+    issuer: nineouting-user-service
+    cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
