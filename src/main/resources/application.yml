@@ -22,6 +22,11 @@ spring:
               uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/users/me/recent-folders
+            # 폴더 안의 회의·남은 안건은 meeting-service 소유라 /api/folders/** 보다 위에 둔다
+            - id: meeting-service
+              uri: ${MEETING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/meetings/**,/api/folders/*/meetings/**,/api/folders/*/pending-agendas
             - id: workspace-service
               uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
               predicates:
