@@ -17,6 +17,15 @@ spring:
           # 위에서부터 먼저 맞는 라우트로 간다. 서비스를 만들 때마다 추가한다 (docs/services/api-gateway.md 3장).
           # /internal/**, /.well-known/** 같은 서비스 간 주소는 라우트를 만들지 않는다 (외부에 열지 않음).
           routes:
+            # /api/users/me/recent-folders는 workspace-service 소유라 /api/users/** 보다 위에 둔다
+            - id: workspace-service-recent-folders
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/users/me/recent-folders
+            - id: workspace-service
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/workspaces/**,/api/invites/**,/api/folders/**
             - id: user-service-auth
               uri: ${USER_SERVICE_URL:http://localhost:8081}
               predicates:
