@@ -42,7 +42,9 @@ class RouteOrderTest {
             "/api/meetings/7/minutes, minutes-service",
             "/api/folders/3/minutes, minutes-service",
             "/api/users/me/review-requests, minutes-service",
-            "/api/users/me/recent-minutes, minutes-service"
+            "/api/users/me/recent-minutes, minutes-service",
+            "/docs/user-service/v3/api-docs, user-service-api-docs",
+            "/docs/minutes-service/v3/api-docs, minutes-service-api-docs"
     })
     void 경로마다_맞는_서비스로_간다(String path, String routeId) {
         MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get(path));

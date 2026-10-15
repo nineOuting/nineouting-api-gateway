@@ -20,6 +20,12 @@
 
 라우트에 없는 경로(`/internal/**`, `/.well-known/**` 포함)는 `404 NOT_FOUND`.
 
+## API 문서 (Swagger)
+
+`http://localhost:8080/swagger-ui.html` — 서비스 5개의 API 문서를 한 화면에서 고른다 (로그인 없이 열림).
+`/docs/{서비스}/v3/api-docs` 라우트가 각 서비스의 `/v3/api-docs`를 가져온다. Authorize 버튼에 로그인으로 받은 access 토큰을 넣으면 "Try it out"이 Gateway를 거쳐 실제로 호출된다.
+운영에서 닫기: `SPRINGDOC_SWAGGER_UI_ENABLED=false`, `SPRINGDOC_API_DOCS_ENABLED=false`.
+
 ## 로컬 실행
 
 필요한 것: JDK 21, 실행 중인 user-service(8081)

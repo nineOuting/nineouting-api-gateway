@@ -26,7 +26,11 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_PATHS = {"/api/auth/**", "/actuator/**"};
+    private static final String[] PUBLIC_PATHS = {
+            "/api/auth/**", "/actuator/**",
+            // API 문서 (Swagger UI와 서비스별 문서)
+            "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/v3/api-docs/**", "/docs/**"
+    };
     private static final List<String> CORS_METHODS = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
     private static final long CORS_MAX_AGE_SECONDS = 3600;
 
