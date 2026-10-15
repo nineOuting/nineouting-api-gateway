@@ -17,6 +17,37 @@ spring:
           # 위에서부터 먼저 맞는 라우트로 간다. 서비스를 만들 때마다 추가한다 (docs/services/api-gateway.md 3장).
           # /internal/**, /.well-known/** 같은 서비스 간 주소는 라우트를 만들지 않는다 (외부에 열지 않음).
           routes:
+            # API 문서: /docs/{서비스}/v3/api-docs → 각 서비스의 /v3/api-docs (Swagger UI가 모아 보여 준다)
+            - id: user-service-api-docs
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/docs/user-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: workspace-service-api-docs
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/docs/workspace-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: meeting-service-api-docs
+              uri: ${MEETING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/docs/meeting-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: minutes-service-api-docs
+              uri: ${MINUTES_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/docs/minutes-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: notification-service-api-docs
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/docs/notification-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
             # 회의의 회의록·폴더의 회의록·내 검토 대기·최근 회의록은 minutes-service 소유라
             # /api/meetings/**, /api/folders/**, /api/users/** 보다 위에 둔다
             - id: minutes-service
@@ -50,6 +81,23 @@ spring:
               uri: ${USER_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/users/**
+
+# 서비스별 API 문서를 한 화면에 모은다: http://localhost:8080/swagger-ui.html (위 /docs/** 라우트로 가져온다)
+# 운영에서 닫기: SPRINGDOC_SWAGGER_UI_ENABLED=false, SPRINGDOC_API_DOCS_ENABLED=false
+springdoc:
+  swagger-ui:
+    urls-primary-name: user-service
+    urls:
+        - name: user-service
+          url: /docs/user-service/v3/api-docs
+        - name: workspace-service
+          url: /docs/workspace-service/v3/api-docs
+        - name: meeting-service
+          url: /docs/meeting-service/v3/api-docs
+        - name: minutes-service
+          url: /docs/minutes-service/v3/api-docs
+        - name: notification-service
+          url: /docs/notification-service/v3/api-docs
 
 nineouting:
   gateway:
