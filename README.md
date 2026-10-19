@@ -17,6 +17,8 @@
 | `/api/meetings/**`, `/api/folders/*/meetings/**`, `/api/folders/*/pending-agendas` | meeting-service | 필요 |
 | `/api/workspaces/**`, `/api/invites/**`, `/api/folders/**` (위 meeting 경로 제외) | workspace-service | 필요 |
 | `/api/notifications/**` (SSE 포함) | notification-service | 필요 |
+| `/ws/meetings/**` (WebSocket, 회의방) | meeting-service | 불필요 — 1회용 입장권 `?ticket=`을 서비스가 확인 |
+| `/ws/stt/**` (WebSocket, 음성) | stt-service | 불필요 — 1회용 입장권 `?ticket=`을 서비스가 확인 |
 
 라우트에 없는 경로(`/internal/**`, `/.well-known/**` 포함)는 `404 NOT_FOUND`.
 
@@ -45,6 +47,7 @@
 | `USER_SERVICE_URL` | `http://localhost:8081` | |
 | `WORKSPACE_SERVICE_URL` | `http://localhost:8082` | |
 | `MEETING_SERVICE_URL` | `http://localhost:8083` | |
+| `STT_SERVICE_URL` | `http://localhost:8770` | stt-service 음성 WebSocket (`/ws/stt/**`) |
 | `MINUTES_SERVICE_URL` | `http://localhost:8084` | |
 | `NOTIFICATION_SERVICE_URL` | `http://localhost:8085` | |
 | `JWT_JWKS_URI` | `http://localhost:8081/.well-known/jwks.json` | access 토큰 검증용 공개키 |
