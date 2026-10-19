@@ -29,7 +29,9 @@ public class SecurityConfig {
     private static final String[] PUBLIC_PATHS = {
             "/api/auth/**", "/actuator/**",
             // API 문서 (Swagger UI와 서비스별 문서)
-            "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/v3/api-docs/**", "/docs/**"
+            "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/v3/api-docs/**", "/docs/**",
+            // WebSocket: 브라우저가 Authorization 헤더를 못 붙여 1회용 입장권으로 들어오고, 각 서비스가 확인한다
+            "/ws/**"
     };
     private static final List<String> CORS_METHODS = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
     private static final long CORS_MAX_AGE_SECONDS = 3600;
