@@ -50,11 +50,11 @@ spring:
                 - SetPath=/v3/api-docs
             # WebSocket. 브라우저 WebSocket은 Authorization 헤더를 붙일 수 없어 1회용 입장권(?ticket=)으로 들어오고,
             # 입장권은 각 서비스가 확인한다 (SecurityConfig에서 토큰 검사를 하지 않는다)
-            - id: meeting-room-websocket       # 회의방: 전사 텍스트·수정본 실시간 중계 (REQ-072, 112)
+            - id: meeting-room-websocket       # 회의방: 전사 텍스트·수정본 실시간 중계 (REQ-079, 083)
               uri: ${MEETING_SERVICE_URL:http://localhost:8083}
               predicates:
                 - Path=/ws/meetings/**
-            - id: stt-websocket                # 회의록 작성자 브라우저 → stt-service 음성 (REQ-072)
+            - id: stt-websocket                # 회의록 작성자 브라우저 → stt-service 음성 (REQ-079)
               uri: ${STT_SERVICE_URL:http://localhost:8770}
               predicates:
                 - Path=/ws/stt/**
