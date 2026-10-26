@@ -58,17 +58,17 @@ spring:
               uri: ${STT_SERVICE_URL:http://localhost:8770}
               predicates:
                 - Path=/ws/stt/**
-            # 회의의 회의록·폴더의 회의록·내 검토 대기·최근 회의록은 minutes-service 소유라
-            # /api/meetings/**, /api/folders/**, /api/users/** 보다 위에 둔다
+            # 회의의 회의록·폴더와 워크스페이스의 회의록·내 검토 대기·최근 회의록·작성 중인 회의록은 minutes-service 소유라
+            # /api/meetings/**, /api/folders/**, /api/workspaces/**, /api/users/** 보다 위에 둔다
             - id: minutes-service
               uri: ${MINUTES_SERVICE_URL:http://localhost:8084}
               predicates:
-                - Path=/api/minutes/**,/api/minutes-templates/**,/api/meetings/*/minutes,/api/folders/*/minutes,/api/users/me/review-requests,/api/users/me/recent-minutes
-            # /api/users/me/recent-folders는 workspace-service 소유라 /api/users/** 보다 위에 둔다
+                - Path=/api/minutes/**,/api/minutes-templates/**,/api/meetings/*/minutes,/api/folders/*/minutes,/api/workspaces/*/minutes/**,/api/workspaces/*/viewed-minutes,/api/users/me/review-requests,/api/users/me/recent-minutes,/api/users/me/writing-minutes
+            # /api/users/me/recent-folders·favorites는 workspace-service 소유라 /api/users/** 보다 위에 둔다
             - id: workspace-service-recent-folders
               uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
               predicates:
-                - Path=/api/users/me/recent-folders
+                - Path=/api/users/me/recent-folders,/api/users/me/favorites
             # 폴더 안의 회의·남은 안건은 meeting-service 소유라 /api/folders/** 보다 위에 둔다
             - id: meeting-service
               uri: ${MEETING_SERVICE_URL:http://localhost:8083}
