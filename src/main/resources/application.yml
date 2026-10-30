@@ -1,0 +1,116 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8090}   # health·prometheus는 외부 포트(8080)와 분리한다
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: classpath:observability/defaults.yml
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # 위에서부터 먼저 맞는 라우트로 간다. 서비스를 만들 때마다 추가한다 (docs/services/api-gateway.md 3장).
+          # /internal/**, /.well-known/** 같은 서비스 간 주소는 라우트를 만들지 않는다 (외부에 열지 않음).
+          routes:
+            # API 문서: /docs/{서비스}/v3/api-docs → 각 서비스의 /v3/api-docs (Swagger UI가 모아 보여 준다)
+            - id: user-service-api-docs
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/docs/user-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: workspace-service-api-docs
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/docs/workspace-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: meeting-service-api-docs
+              uri: ${MEETING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/docs/meeting-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: minutes-service-api-docs
+              uri: ${MINUTES_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/docs/minutes-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            - id: notification-service-api-docs
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/docs/notification-service/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
+            # WebSocket. 브라우저 WebSocket은 Authorization 헤더를 붙일 수 없어 1회용 입장권(?ticket=)으로 들어오고,
+            # 입장권은 각 서비스가 확인한다 (SecurityConfig에서 토큰 검사를 하지 않는다)
+            - id: meeting-room-websocket       # 회의방: 전사 텍스트·수정본 실시간 중계 (REQ-079, 083)
+              uri: ${MEETING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/ws/meetings/**
+            - id: stt-websocket                # 회의록 작성자 브라우저 → stt-service 음성 (REQ-079)
+              uri: ${STT_SERVICE_URL:http://localhost:8770}
+              predicates:
+                - Path=/ws/stt/**
+            # 회의의 회의록·폴더와 워크스페이스의 회의록·내 검토 대기·최근 회의록·작성 중인 회의록은 minutes-service 소유라
+            # /api/meetings/**, /api/folders/**, /api/workspaces/**, /api/users/** 보다 위에 둔다
+            - id: minutes-service
+              uri: ${MINUTES_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/minutes/**,/api/minutes-templates/**,/api/meetings/*/minutes,/api/folders/*/minutes,/api/workspaces/*/minutes/**,/api/workspaces/*/viewed-minutes,/api/users/me/review-requests,/api/users/me/recent-minutes,/api/users/me/writing-minutes
+            # /api/users/me/recent-folders·favorites는 workspace-service 소유라 /api/users/** 보다 위에 둔다
+            - id: workspace-service-recent-folders
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/users/me/recent-folders,/api/users/me/favorites
+            # 폴더 안의 회의·남은 안건은 meeting-service 소유라 /api/folders/** 보다 위에 둔다
+            - id: meeting-service
+              uri: ${MEETING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/meetings/**,/api/folders/*/meetings/**,/api/folders/*/pending-agendas
+            - id: workspace-service
+              uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/workspaces/**,/api/invites/**,/api/folders/**
+            # SSE(/api/notifications/stream) 포함. WebFlux gateway는 스트리밍 응답을 그대로 중계한다
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/api/notifications/**
+            - id: user-service-auth
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/**
+            - id: user-service-users
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/users/**
+
+# 서비스별 API 문서를 한 화면에 모은다: http://localhost:8080/swagger-ui.html (위 /docs/** 라우트로 가져온다)
+# 운영에서 닫기: SPRINGDOC_SWAGGER_UI_ENABLED=false, SPRINGDOC_API_DOCS_ENABLED=false
+springdoc:
+  swagger-ui:
+    urls-primary-name: user-service
+    urls:
+        - name: user-service
+          url: /docs/user-service/v3/api-docs
+        - name: workspace-service
+          url: /docs/workspace-service/v3/api-docs
+        - name: meeting-service
+          url: /docs/meeting-service/v3/api-docs
+        - name: minutes-service
+          url: /docs/minutes-service/v3/api-docs
+        - name: notification-service
+          url: /docs/notification-service/v3/api-docs
+
+nineouting:
+  gateway:
+    jwks-uri: ${JWT_JWKS_URI:http://localhost:8081/.well-known/jwks.json}
+    issuer: nineouting-user-service
+    cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
