@@ -73,7 +73,7 @@ spring:
             - id: meeting-service
               uri: ${MEETING_SERVICE_URL:http://localhost:8083}
               predicates:
-                - Path=/api/meetings/**,/api/folders/*/meetings/**,/api/folders/*/pending-agendas
+                - Path=/api/meetings/**,/api/folders/*/meetings/**,/api/folders/*/pending-agendas/**
             - id: workspace-service
               uri: ${WORKSPACE_SERVICE_URL:http://localhost:8082}
               predicates:
