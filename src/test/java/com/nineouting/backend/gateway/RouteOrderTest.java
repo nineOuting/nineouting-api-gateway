@@ -35,6 +35,8 @@ class RouteOrderTest {
             "/api/folders/3/members, workspace-service",
             "/api/folders/3/meetings, meeting-service",
             "/api/folders/3/pending-agendas, meeting-service",
+            "/api/folders/3/pending-agendas/5, meeting-service",
+            "/api/folders/3/pending-agendas/5/restore, meeting-service",
             "/api/meetings/calendar, meeting-service",
             "/api/meetings/7/start, meeting-service",
             "/api/notifications/stream, notification-service",
