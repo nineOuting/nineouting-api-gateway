@@ -31,7 +31,9 @@ public class SecurityConfig {
             // API 문서 (Swagger UI와 서비스별 문서)
             "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/v3/api-docs/**", "/docs/**",
             // WebSocket: 브라우저가 Authorization 헤더를 못 붙여 1회용 입장권으로 들어오고, 각 서비스가 확인한다
-            "/ws/**"
+            "/ws/**",
+            // 로그인 전 초대 첫 화면 (워크스페이스 이름, 초대한 사람). workspace-service도 같은 경로만 연다
+            "/api/invites/*/preview", "/api/workspaces/invitations/*/preview"
     };
     private static final List<String> CORS_METHODS = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
     private static final long CORS_MAX_AGE_SECONDS = 3600;
