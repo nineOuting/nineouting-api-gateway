@@ -58,6 +58,10 @@ class GatewayTest {
         registry.add("spring.cloud.gateway.server.webflux.routes[2].id", () -> "stopped-service");
         registry.add("spring.cloud.gateway.server.webflux.routes[2].uri", () -> "http://127.0.0.1:1");
         registry.add("spring.cloud.gateway.server.webflux.routes[2].predicates[0]", () -> "Path=/api/stopped/**");
+        // 초대 미리보기 확인용 (실제로는 workspace-service)
+        registry.add(routes + "[3].id", () -> "workspace-service");
+        registry.add(routes + "[3].uri", () -> userService);
+        registry.add(routes + "[3].predicates[0]", () -> "Path=/api/workspaces/**,/api/invites/**");
     }
 
     @BeforeEach
@@ -78,6 +82,17 @@ class GatewayTest {
         client.post().uri("/api/auth/login").exchange()
                 .expectStatus().isOk()
                 .expectBody().jsonPath("$.path").isEqualTo("/api/auth/login");
+    }
+
+    @Test
+    void 초대_미리보기만_토큰_없이_서비스로_가고_나머지_초대_경로는_토큰이_필요하다() {
+        client.get().uri("/api/invites/abc/preview").exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.path").isEqualTo("/api/invites/abc/preview");
+        client.get().uri("/api/workspaces/invitations/abc/preview").exchange()
+                .expectStatus().isOk();
+        client.get().uri("/api/invites/abc").exchange().expectStatus().isUnauthorized();
+        client.post().uri("/api/workspaces/invitations/abc/accept").exchange().expectStatus().isUnauthorized();
     }
 
     @Test
